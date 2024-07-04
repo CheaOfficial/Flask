@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="container">
+{#            This is jinja template engine#}
+{#            {{  }}  This is an output#}
+
+{#            {% set name = 'doomguy' %}#}
+{#            {{ name }}#}
+
+        <h5>1. OutPut</h5>
+        <div>{{ "Hello World" }}</div>
+        <hr>
+
+        <h5>2. Operation + - * /</h5>
+        <div>{{ "1 and 2" }}</div>
+        <div>{{ " + : "}}{{ 1 + 2 }}</div>
+        <div>{{ " - : "}}{{ 1 - 2 }}</div>
+        <div>{{ " * : "}}{{ 1 * 2 }}</div>
+        <div>{{ " / : "}}{{ 1 / 2 }}</div>
+        <hr>
+
+        <h5>3. if-statement</h5>
+{#                time is from route() in app.py#}
+        {% if time > 7 and time < 11 %}
+            <h3>Good Reverse Evening</h3>
+        {% elif time > 11 and time < 5%}
+            <h3>Good day, Sun!</h3>
+        {% else %}
+            <h3>GO TO SLEEP!</h3>
+        {% endif %}
+        <hr>
+
+        <h5>4. for loop</h5>
+        {% for x in range(20) %}
+            {{ x }}
+        {% endfor %}
+        <hr>
+
+        <h5>5. conditioned for-loop</h5>
+        This is all the students:
+        {% for student in list if student.name|length > 0-%}
+            {{- student.name|title -}},
+        {% endfor %}.
+        <hr>
+
+        <h5>6. Exponent Operator</h5>
+        {% set byte = 2 ** 8%}
+        byte = 2 ** 8 = {{ byte }} Same as: Math.pow(2, 8)
+        <hr>
+
+        <h5>7. String Manipulation</h5>
+        String concat :
+            {{ "dlroW" ~
+            " olleH" }}     <br>
+        lowercase {{ "LOWERCASE"|lower }} <br>
+        title {{ "A B C D E"|title }} <br>
+        <hr>
+
+        <h5>8. Special Blocks</h5>
+        {% filter e %}
+        {% raw %}
+            This is a raw block where {{nothing is evaluated}}
+            {% not even this %}
+            and <html is escaped> too with "e" filter.
+        {% endraw %}
+        {% endfilter %}
+        <br>
+        {% macro myfunc(x) %}
+            This is a reusable macro, with arguments: {{x}}
+        {% endmacro %}
+
+        {{ myfunc(42) }}
+
+        {#
+        this is a comment
+        #}
+        <hr>
+
+        <h5>10. Conversion</h5>
+        {{ 100.32 }} print the output number as it is <br>
+        {{ 10.1232 | int }} datatype is int <br>
+        {{ 10.999 | round }} round to nearest decimal num <br>
+        {{ 10 | float }} datatype is float
+        <hr>
+
+        <h5>11. Macro (special block)</h5>
+        {% macro greeting(name) %}
+        Hello, {{ name }}!
+        {% endmacro %}
+
+        {% raw %}
+        {% macro greeting(name) %}
+        Hello, {{ name }}!
+        {% endmacro %}
+        {% endraw %}<br><br>
+
+        {{ greeting("Alice") }} <br>
+        {{ greeting("Bob") }}
+        <hr>
+
+        <h5>12. Replace</h5>
+        {{ "Datacoves" | replace("coves", "types") }}<br>
+        {{ "Datatypes" | length }}<br>
+        capitalize: {{ "CAPITALIZE" | capitalize }},
+        title : {{ "THIS IS TITLE!!!" | title }}
+        <hr>
+
+        <h5>13. String</h5>
+        repeat string : {{ '+' * 10 }} <br>
+        substring : {{ "LONGword" [0:6] }}<br>
+        split : {{ "Data broh".split(' ') }}
+        <hr>
+
+        <h5>14. Round</h5>
+        Round to nearest whole: {{ 20.4394 | round }} <br>
+        round to specific decimal place: {{ 20.3231 | round(1) }} <br>
+        round down: {{ 20.5 | round(method='floor') }} <br>
+        round up: {{ 20.5 | round(method='ceil') }} <br>
+        <hr>
+
+        <h5>15. Class</h5>
+
+        <h3>{{ person.name }}</h3>
+        <p>Age: {{ person.age }}</p>
+        <hr>
+
+        <h5>16. Is Defined</h5>
+{#        <form action="/jinja" method="post">#}
+{#            <label for="username">Enter your name:</label><br>#}
+{#            <input type="text" id="username" name="username"><br>#}
+{#            <input type="submit" value="Submit">#}
+{#        </form>#}
+        {% set user = ["RandomName", "", "", "Randy Orton" ]|random %}
+        user is {{ user }} <br>
+
+        {% if user %}
+            Welcome, Mr./Ms./Mrs. {{ user }}!
+        {% else %}
+            Welcome, Guest User.
+        {% endif %}
+        <hr>
+
+        <h5>17. Is None</h5>
+
+        {% set var_a = [None, None, "Yo", 1230]|random %}
+        var_a is {{ var_a }}
+        {% if var_a is none %}
+            <p>this value has no value</p>
+        {% else %}
+            this value has value.
+        {% endif %}
+        <hr>
+
+        <h5>18. Is Even & Is Odd</h5>
+        {% set num = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]|random %}
+        num currently is {{ num }} <br>
+        {% if num is even %}
+            {{ num }} is EVEN!
+        {% else %}
+            {{ num }} is NOT EVEN!
+        {% endif %}<br>
+
+        num currently is {{ num }} <br>
+        {% if num is odd %}
+            {{ num }} is ODD!
+        {% else %}
+            {{ num }} is NOT ODD!
+        {% endif %}
+        <hr>
+
+        <h5>19. Is String</h5>
+        {% set items = ["asdlkfj", 1231, "fasdkuf", '2', 'a'] %}
+        {% set str = items|random %}
+        str is {{ str }}<br>
+        {% if str is string %}
+            {{ str }} is string.
+        {% else %}
+            {{ str }} is not string.
+        {% endif %}
+        <hr>
+
+        <h5>20. Inheritance</h5>
+        {% extends "shared.html" %}
+        <hr>
+    </div>
+</body>
+</html>

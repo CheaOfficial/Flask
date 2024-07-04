@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Input</title>
+</head>
+<body>
+     <form action="/debug" method="post" enctype="multipart/form-data">
+        <!-- CSRF Token -->
+{#        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">#}
+
+        <!-- Username -->
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit">Update Profile</button>
+        </div>
+    </form>
+</body>
+</html>

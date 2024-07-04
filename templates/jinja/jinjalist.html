@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>Student List</h1>
+    <ul>
+        {% for student in list %}
+            <li>Name: {{ student.name }}, Age: {{ student.age }}, Grade: {{ student.grade }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

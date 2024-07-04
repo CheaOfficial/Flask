@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HELP</title>
+    <style>
+        #hidden-content {
+            display: none;
+            text-align: center;
+        }
+        #back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                document.getElementById("hidden-content").style.display = "block";
+            }, 5000);
+        });
+    </script>
+</head>
+<body>
+    <h1 style="text-align: center">
+        WELCOME TO THIS BLANK SPACE. <br>
+        THERE'S NOTHING HERE AT ALL! <br>
+        THERE'S NO ONE TO HELP. GO BACK!
+    </h1>
+
+    <div id="hidden-content">
+        <h2>HERE'S THE BUTTON TO HELP YOU GO BACK.</h2>
+        <button id="back-button" onclick="window.history.back()">Go Back</button>
+    </div>
+</body>
+</html>
