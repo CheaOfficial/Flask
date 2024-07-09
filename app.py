@@ -4,6 +4,7 @@ from datetime import date
 import requests
 import os
 import sqlite3
+import base64
 
 from werkzeug.utils import secure_filename
 
@@ -290,20 +291,40 @@ def submit_add_product():
 
 @app.post('/edit_product')
 def edit_product():
+    edit_picture = request.files.get('edit_picture')
+    image_url = None
+
+    if edit_picture and edit_picture.filename != '' and allowed_file(edit_picture.filename):
+        filename = secure_filename(edit_picture.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        edit_picture.save(filepath)
+        image_url = filename  # Store the relative filename
+
     pid = request.form.get('edit_product_id')
     title = request.form.get('edit_title')
     price = request.form.get('edit_price')
     category = request.form.get('edit_category')
     description = request.form.get('edit_description')
 
-    row = conn.execute("""
-        UPDATE tbl_product 
-        SET ptitle = ?, pprice = ?, pcategory = ?, pdescription = ?
-        WHERE pid = ?
-    """, (title, price, category, description, pid))
+    cur = conn.cursor()
+
+    if image_url:
+        cur.execute("""
+            UPDATE tbl_product 
+            SET ptitle = ?, pprice = ?, pcategory = ?, pdescription = ?, pimage = ?
+            WHERE pid = ?
+        """, (title, price, category, description, image_url, pid))
+    else:
+        cur.execute("""
+            UPDATE tbl_product 
+            SET ptitle = ?, pprice = ?, pcategory = ?, pdescription = ?
+            WHERE pid = ?
+        """, (title, price, category, description, pid))
 
     conn.commit()
+
     return redirect(url_for('add_product'))
+
 
 @app.post('/delete_product')
 def delete_product():
@@ -318,6 +339,28 @@ def delete_product():
     conn.commit()  # Ensure the changes are committed to the database
     return redirect(url_for('add_product'))
 
+
+@app.route('/crop_image', methods=['GET', 'POST'])
+def crop_image():
+    if request.method == 'POST':
+        cropped_image_data = request.form['cropped_image']
+        original_filename = request.form['original_filename']
+
+        try:
+            # Decode the base64 image data
+            header, data = cropped_image_data.split(',', 1)
+            image_data = base64.b64decode(data)
+
+            # Save the image to a file
+            with open(f'static/uploads/{original_filename}', 'wb') as f:
+                f.write(image_data)
+
+            return redirect(url_for('add_product'))
+        except Exception as e:
+            return f"An error occurred: {str(e)}"
+
+    image_data = request.args.get('image')
+    return render_template('cropper/crop_image.html', image_data=image_data)
 
 
 # TEST TEST TEST

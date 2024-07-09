@@ -11,11 +11,15 @@
             flex: 1;
             padding: 20px;
         }
-        .table-container {
-            max-width: 50%;
-        }
-        .form-container {
-            max-width: 50%;
+        {#.table-container {#}
+        {#    max-width: 50%;#}
+        {#}#}
+        {#.form-container {#}
+        {#    max-width: 50%;#}
+        {#}#}
+        .table-responsive {
+            max-height: 600px; /* or whatever height you prefer */
+            overflow-y: auto;
         }
         img {
             max-width: 100px;
@@ -33,6 +37,8 @@
                     <h1>Table Product</h1>
                 </div>
                 <div class="card-body">
+                    <div class="table-responsive">
+
                     <table class="table">
                         <thead>
                             <tr>
@@ -73,6 +79,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 
@@ -95,7 +102,7 @@
                         </div>
                         <div class="form-group">
                             <label for="category">Category:</label>
-                            <select class="form-control" name="category" id="category">
+                            <select class="form-control form-select" name="category" id="category">
                                 {% for item in product %}
                                     <option value="{{ item.category }}">{{ item.category }}</option>
                                 {% endfor %}
@@ -126,19 +133,15 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form action="/edit_product" method="post">
+                <form id="editProductForm" action="/edit_product" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
                         <input type="hidden" id="edit_product_id" name="edit_product_id">
 
-{#                        <div class="form-group">#}
-{#                            <img src="#" alt="" id="edit_file">#}
-{#                            <label for="edit_file">Picture:</label>#}
-{#                            <input type="file" class="form-control-file" id="edit_file" name="edit_file">#}
-{#                        </div>#}
-
                         <div class="form-group">
-                            <label for="edit_picture">Current Picture:</label><br>
-                            <img id="current_picture" src="" alt="Current Picture" style="max-width: 200px; max-height: 200px;">
+                            <label for="current_picture">Current Picture:</label><br>
+                            <img id="current_picture" src="#" alt="Current Picture" style="max-width: 200px; max-height: 200px;">
+                            <input type="file" class="form-control-file" id="edit_picture" name="edit_picture" accept="image/png, image/jpeg" onchange="previewEditImage(event)">
+                            <button type="button" class="btn btn-secondary mt-2" id="btn-crop">Crop Image</button>
                         </div>
 
                         <div>
@@ -161,12 +164,16 @@
                             <label for="edit_description">Description:</label>
                             <textarea class="form-control" id="edit_description" name="edit_description" rows="4"></textarea>
                         </div>
-                        <button class="btn btn-primary" type="submit">Save Changes</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
 
     <!-- Modal for Delete Confirmation -->
     <div class="modal fade" id="deleteProductModal" tabindex="-1" role="dialog" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
@@ -192,8 +199,6 @@
         </div>
     </div>
 
-
-
     <script>
         // Embed the product data in a JavaScript variable
         let products = {{ product|tojson }};
@@ -215,7 +220,13 @@
                     $('#current_picture').attr('src', 'static/uploads/' + product.image);
 
                     $('#editProductModal').modal('show');
+                    toggleCropButton();
                 }
+            });
+
+            // Submit form on modal close (if needed)
+            $('#editProductModal').on('hidden.bs.modal', function () {
+                $('#editProductForm').submit();
             });
 
             // Script to handle modal for deleting
@@ -224,6 +235,15 @@
                 let productId = $(this).data('id');
                 $('#delete_product_id').val(productId);
                 $('#deleteProductModal').modal('show');
+            });
+
+            // Redirect to cropping page with current image
+            $('#btn-crop').click(function() {
+                {#const imageUrl = $('#current_picture').attr('src');#}
+                const currentPictureSrc = document.getElementById('current_picture').src;
+
+                {#window.location.href = `/crop_image?image=${encodeURIComponent(imageUrl)}`;#}
+                window.location.href = `/crop_image?image=${encodeURIComponent(currentPictureSrc)}`;
             });
         });
 
@@ -237,6 +257,59 @@
             };
             reader.readAsDataURL(event.target.files[0]);
         }
+
+        function previewEditImage(event){
+            const readerEdit = new FileReader();
+            readerEdit.onload = function(){
+                const outputEdit = document.getElementById('current_picture');
+                outputEdit.src = readerEdit.result;
+                outputEdit.style.display = 'block';
+                toggleCropButton();
+            };
+            readerEdit.readAsDataURL(event.target.files[0]);
+        }
+
+        function toggleCropButton() {
+            const currentPictureSrc = document.getElementById('current_picture').src;
+            const btnCrop = document.getElementById('btn-crop');
+            btnCrop.disabled = !(currentPictureSrc && currentPictureSrc !== '#');
+        }
     </script>
+    <script>
+        document.getElementById('btn-crop').addEventListener('click', () => {
+            const editProductId = document.getElementById('edit_product_id').value;
+            const pictureSrc = document.getElementById('current_picture').src;
+            const originalFilename = pictureSrc.split('/').pop(); // Get the original filename
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/crop_image';
+            form.style.display = 'none';
+
+            const inputId = document.createElement('input');
+            inputId.type = 'hidden';
+            inputId.name = 'product_id';
+            inputId.value = editProductId;
+            form.appendChild(inputId);
+
+            const inputImage = document.createElement('input');
+            inputImage.type = 'hidden';
+            inputImage.name = 'image';
+            inputImage.value = pictureSrc;
+            form.appendChild(inputImage);
+
+            const inputFilename = document.createElement('input');
+            inputFilename.type = 'hidden';
+            inputFilename.name = 'original_filename';
+            inputFilename.value = originalFilename;
+            form.appendChild(inputFilename);
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+    </script>
+
+
+{#    <script src="../static/js/customcropjs/cropscript1.js"></script>#}
 </body>
 </html>

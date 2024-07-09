@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Image</title>
+    <!-- Include Cropper.js CSS and JS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        #image_to_crop {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Crop Image</h1>
+        <img class="img-fluid mb-4" id="image_to_crop" src="{{ image_data }}" alt="Image to crop" style="max-width: 100%;">
+        <button class="btn btn-primary" id="cropImageBtn">Crop</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageToCrop = document.getElementById('image_to_crop');
+            const cropImageBtn = document.getElementById('cropImageBtn');
+
+            const cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, // Set your desired aspect ratio
+                viewMode: 1, // Adjust as needed
+            });
+
+            cropImageBtn.addEventListener('click', function () {
+                const croppedCanvas = cropper.getCroppedCanvas();
+                const croppedImage = croppedCanvas.toDataURL('image/png');
+
+                // Get the original filename from the src URL
+                const imageSrc = imageToCrop.src;
+                const url = new URL(imageSrc);
+                const originalFilename = url.pathname.split('/').pop();
+
+                // Submit the cropped image to the server
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/crop_image';
+                form.enctype = 'multipart/form-data';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'cropped_image';
+                input.value = croppedImage;
+
+                form.appendChild(input);
+
+                // Include the original filename in the form
+                const inputFilename = document.createElement('input');
+                inputFilename.type = 'hidden';
+                inputFilename.name = 'original_filename';
+                inputFilename.value = originalFilename;
+
+                form.appendChild(inputFilename);
+
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+    </script>
+</body>
+</html>
